@@ -25,7 +25,7 @@ namespace Stripe.Tests.Xunit
                 Currency = "usd",
                 Destination = account.Id,
             };
-            chargeOptions.AddExpand("balance_transaction");
+            chargeOptions.AddExpand("balance_transaction.source");
             chargeOptions.AddExpand("transfer.balance_transaction.source");
             chargeOptions.AddExpand("destination");
 
@@ -34,13 +34,19 @@ namespace Stripe.Tests.Xunit
             accountService.Delete(account.Id);
         }
 
-
         [Fact]
         public void should_have_all_objects_expanded()
         {
             Charge.BalanceTransactionId.Should().Be(Charge.BalanceTransaction.Id);
             Charge.DestinationId.Should().Be(Charge.Destination.Id);
             Charge.Transfer.BalanceTransaction.Source.Id.Should().Be(Charge.Transfer.Id);
+        }
+
+        [Fact]
+        public void should_properly_deserialize_balance_transaction_source()
+        {
+            Charge.BalanceTransaction.Source.Type.Should().Be(BalanceTransactionSourceType.Charge);
+            Charge.BalanceTransaction.SourceId.Should().Be(Charge.BalanceTransaction.Source.Charge.Id);
         }
     }
 }
